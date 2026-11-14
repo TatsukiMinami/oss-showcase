@@ -77,69 +77,72 @@ data:
 
     CSS = """
     :root {
-      --navy: #0b2238; --navy-2: #12304d; --blue: #216a9c; --magenta: #be4493;
-      --sky: #4cc0ef; --gold: #deb010; --paper: #eef4f9; --muted: #9db4c8;
+      --navy: #0b2238; --blue: #216a9c; --magenta: #be4493; --gold: #deb010;
+      --paper: #eef4f9; --muted: #9db4c8;
       --s: clamp(7.5rem, 5rem + 6vw, 12rem); --m: .3rem;
       color-scheme: dark;
     }
     body {
       margin: 0; min-block-size: 100dvh; background: var(--navy); color: var(--paper);
-      font-family: "Public Sans", system-ui, sans-serif; line-height: 1.5;
+      font-family: "Public Sans", system-ui, sans-serif; line-height: 1.5; overflow-x: clip;
     }
     .wrap { max-inline-size: 110rem; margin-inline: auto; padding: clamp(1.5rem, 1rem + 2vw, 3.5rem); }
-    header { display: grid; grid-template-columns: auto 1fr; gap: clamp(1rem, .5rem + 2vw, 2.5rem); align-items: center; }
-    @media (width < 40rem) { header { grid-template-columns: 1fr; } }
+    /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
+    .p { display: inline-block; max-inline-size: 100%; }
+
+    header { display: flex; align-items: center; gap: clamp(.75rem, .5rem + 1.2vw, 1.5rem); }
+    .logo { inline-size: clamp(3.5rem, 2.5rem + 3vw, 6rem); block-size: auto; flex: none; }
+    .logo .b { fill: var(--blue); } .logo .m { fill: var(--magenta); }
+    h1 { margin: 0; font-family: Rubik, system-ui, sans-serif; font-weight: 700; letter-spacing: -.01em;
+      font-size: clamp(2rem, 1.2rem + 3vw, 4.5rem); line-height: 1; }
+    .place { margin: .35rem 0 0; color: var(--muted); font-size: clamp(.95rem, .8rem + .6vw, 1.5rem); word-break: auto-phrase; }
+
+    /* ハニカム。左に置いた浮動要素の shape-outside で、行ごとに半分ずらす。浮動要素の高さを % で決めるため、親を flex にする */
+    /* 最後の段が ul の高さに数えられず、1 段分はみ出す（Chrome で測った）。その分を下に足す */
+    .hive { display: flex; margin-block-start: clamp(1.5rem, 1rem + 2.5vw, 3.5rem); padding-block-end: var(--s);
+      --f: calc(1.732 * var(--s) + 4 * var(--m) - 1px); }
+    .hive ul { flex: 1; list-style: none; margin: 0; padding: 0; font-size: 0; }
+    .hive ul::before { content: ""; float: left; inline-size: calc(var(--s) / 2 + var(--m)); block-size: 120%;
+      shape-outside: repeating-linear-gradient(#0000 0 calc(var(--f) - 3px), #000 0 var(--f)); }
+    .hive li { display: inline-block; vertical-align: top; inline-size: var(--s); block-size: calc(var(--s) * 1.1547);
+      margin: var(--m); margin-block-end: calc(var(--m) - var(--s) * .2885); font-size: 1rem; }
+    .hex { position: relative; isolation: isolate; display: grid; place-content: center; text-align: center;
+      inline-size: 100%; block-size: 100%; padding: 0 12%; box-sizing: border-box; color: white; text-decoration: none; }
+    .hex::before, .hex::after { content: ""; position: absolute; inset: 0; z-index: -1;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
+    .hex::before { background: var(--tile); transition: background-color .2s; }
+    .blue { --tile: var(--blue); } .magenta { --tile: var(--magenta); }
+    a.hex:hover::before { background: color-mix(in oklab, var(--tile), white 18%); }
+    /* clip-path は自分のフォーカスの枠も切るので、ひと回り大きい六角形を後ろに描く */
+    a.hex:focus-visible { outline: none; }
+    a.hex:focus-visible::after { inset: -.35rem; z-index: -2; background: var(--sky, #4cc0ef); }
+    .name { font-family: Rubik, system-ui, sans-serif; font-weight: 600; line-height: 1.15;
+      font-size: clamp(.95rem, .7rem + .8vw, 1.6rem); overflow-wrap: anywhere; }
+
+    /* 動いているアプリの数。蜂の巣の最初の 1 枚にする */
+    .count { --tile: var(--gold); color: var(--navy); }
+    .count b { display: block; font-family: Rubik, system-ui, sans-serif; font-weight: 700; line-height: 1;
+      font-size: clamp(2.6rem, 1.6rem + 3vw, 5rem); }
+    .count span { font-weight: 600; font-size: clamp(.75rem, .6rem + .4vw, 1.05rem); line-height: 1.3; }
+    /* 蜂の巣の空いているマス。押すとリポジトリが開く */
+    .invite { --tile: var(--gold); color: var(--gold); }
+    .invite::after { inset: .3rem; background: var(--navy); }
+    a.invite:hover::after { background: color-mix(in oklab, var(--navy), var(--gold) 12%); }
+    .invite .name { font-size: clamp(.85rem, .65rem + .6vw, 1.3rem); }
+    .invite .plus { display: block; font-family: Rubik, system-ui, sans-serif; font-weight: 600; line-height: 1;
+      font-size: clamp(1.8rem, 1.2rem + 2vw, 3.2rem); }
+
+    footer { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
+      color: var(--muted); font-size: clamp(1rem, .85rem + .6vw, 1.5rem); }
+    footer p { margin: 0; word-break: auto-phrase; }
+    footer a { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
+    footer a:has(.qr) { flex: none; display: block; border-radius: .5rem; }
+    footer a:focus-visible { outline: 3px solid #4cc0ef; outline-offset: 3px; }
+    .qr { display: block; inline-size: clamp(6rem, 4rem + 5vw, 10rem); block-size: auto; border-radius: .5rem; }
     /* 黒猫のトゲが紺の背景に沈まないよう、2 匹の後ろにだけ光を当てる */
     .mascots { margin-inline-start: auto; display: flex; align-items: end; gap: clamp(.25rem, 1vw, 1rem); padding-inline: 1rem;
       background: radial-gradient(ellipse 60% 55% at 50% 75%, rgb(76 192 239 / .22), transparent 70%); }
     .mascots img { block-size: clamp(5rem, 3rem + 5vw, 10rem); inline-size: auto; }
-    .logo { inline-size: clamp(5rem, 3rem + 7vw, 11rem); block-size: auto; }
-    .logo .b { fill: var(--blue); } .logo .m { fill: var(--magenta); }
-    h1 { font-family: Rubik, system-ui, sans-serif; font-weight: 600; margin: 0;
-      font-size: clamp(1.6rem, 1rem + 2vw, 3.25rem); line-height: 1.2; text-wrap: balance; }
-    /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
-    .p { display: inline-block; max-inline-size: 100%; }
-    h1, .lead, footer p { word-break: auto-phrase; }
-    h1 strong { color: var(--gold); font-weight: 700; }
-    .lead { margin: .5rem 0 0; color: var(--muted); font-size: clamp(1rem, .85rem + .7vw, 1.6rem); max-inline-size: 48ch; }
-    .lead b { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
-    footer a { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
-    footer a:has(.qr) { flex: none; display: block; border-radius: .5rem; }
-    .cta { display: inline-flex; align-items: center; gap: .6rem; margin-block-start: 1.25rem; padding: .7rem 1.4rem;
-      border-radius: 999px; background: var(--gold); color: var(--navy); font-family: Rubik, system-ui, sans-serif;
-      font-weight: 600; font-size: clamp(1rem, .85rem + .5vw, 1.35rem); text-decoration: none; transition: background-color .2s; }
-    .cta:hover { background: color-mix(in oklab, var(--gold), white 20%); }
-    .cta svg { inline-size: 1.3em; block-size: 1.3em; fill: currentColor; }
-    .cta:focus-visible, footer a:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
-
-    /* ハニカム。左に置いた浮動要素の shape-outside で、行ごとに半分ずらす */
-    /* 浮動要素の高さを % で決めるため、親を flex にする */
-    /* 最後の段が ul の高さに数えられず、1 段分はみ出す（Chrome で測った）。その分を下に足す */
-    .hive { display: flex; margin-block-start: clamp(2rem, 1rem + 3vw, 4rem); padding-block-end: var(--s); --f: calc(1.732 * var(--s) + 4 * var(--m) - 1px); }
-    .hive ul { flex: 1; list-style: none; margin: 0; padding: 0; font-size: 0; }
-    .hive ul::before { content: ""; float: left; inline-size: calc(var(--s) / 2 + var(--m)); block-size: 120%;
-      shape-outside: repeating-linear-gradient(#0000 0 calc(var(--f) - 3px), #000 0 var(--f)); }
-    .hive li { display: inline-block; inline-size: var(--s); block-size: calc(var(--s) * 1.1547);
-      margin: var(--m); margin-block-end: calc(var(--m) - var(--s) * .2885); font-size: 1rem; vertical-align: top; }
-    .hive a { position: relative; isolation: isolate; display: grid; place-content: center; text-align: center;
-      inline-size: 100%; block-size: 100%; padding: 0 12%; box-sizing: border-box;
-      color: white; text-decoration: none; }
-    .hive a::before, .hive a::after { content: ""; position: absolute; inset: 0; z-index: -1;
-      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
-    .hive a::before { background: var(--tile); transition: background-color .2s; }
-    .hive .blue { --tile: var(--blue); } .hive .magenta { --tile: var(--magenta); }
-    .hive a:hover::before { background: color-mix(in oklab, var(--tile), white 18%); }
-    /* clip-path は自分のフォーカスの枠も切るので、ひと回り大きい六角形を後ろに描く */
-    .hive a:focus-visible { outline: none; }
-    .hive a:focus-visible::after { inset: -.35rem; z-index: -2; background: var(--gold); }
-    .name { font-family: Rubik, system-ui, sans-serif; font-weight: 600; line-height: 1.15;
-      font-size: clamp(.95rem, .7rem + .8vw, 1.6rem); overflow-wrap: anywhere; }
-
-    .empty { margin-block-start: 3rem; font-size: 1.5rem; color: var(--muted); }
-    footer { margin-block-start: clamp(2rem, 1rem + 3vw, 4rem); display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
-      color: var(--muted); font-size: clamp(1rem, .8rem + .8vw, 1.75rem); }
-    footer p { margin: 0; }
-    .qr { display: block; inline-size: clamp(6rem, 4rem + 6vw, 11rem); block-size: auto; border-radius: .5rem; }
 
     /* ページを開いたときに 1 回だけ、ロゴとタイルが組み上がる */
     @media (prefers-reduced-motion: no-preference) {
@@ -157,12 +160,10 @@ data:
         const res = await fetch(location.href, { cache: "no-store" });
         if (!res.ok) return;
         const next = new DOMParser().parseFromString(await res.text(), "text/html");
-        for (const id of ["count", "hive"]) {
-          const cur = document.getElementById(id), fresh = next.getElementById(id);
-          if (cur && fresh && cur.innerHTML !== fresh.innerHTML) {
-            fresh.querySelectorAll("li").forEach((li) => (li.style.animation = "none"));
-            cur.replaceWith(fresh);
-          }
+        const cur = document.getElementById("hive"), fresh = next.getElementById("hive");
+        if (cur && fresh && cur.innerHTML !== fresh.innerHTML) {
+          fresh.querySelectorAll("li").forEach((li) => (li.style.animation = "none"));
+          cur.replaceWith(fresh);
         }
       } catch {}
     }, 60000);
@@ -174,12 +175,13 @@ data:
         for i in range(12):
             logo = logo.replace("<polygon ", f'<polygon style="--i:{i}" data-x ', 1)
         logo = logo.replace(" data-x ", " ")
-        tiles = "".join(
-            f'<li style="--i:{i}"><a class="{TILE_COLORS[zlib.crc32(h.encode()) % 2]}" href="https://{html.escape(h)}/">'
+        tiles = [f'<li style="--i:0"><div class="hex count"><b>{len(names)}</b><span>動いている<br>アプリ</span></div></li>']
+        tiles += [
+            f'<li style="--i:{i}"><a class="hex {TILE_COLORS[zlib.crc32(h.encode()) % 2]}" href="https://{html.escape(h)}/">'
             f'<span class="name">{html.escape(h.split(".")[0])}</span></a></li>'
-            for i, h in enumerate(names))
-        hive = (f'<section class="hive" id="hive" aria-label="動いているアプリ"><ul>{tiles}</ul></section>' if names else
-                '<p class="empty" id="hive">まだアプリはありません。最初の 1 つを PR で載せてみませんか。</p>')
+            for i, h in enumerate(names, start=1)]
+        tiles.append(f'<li style="--i:{len(names) + 1}"><a class="hex invite" href="{REPO}">'
+                     f'<span class="name"><span class="plus">＋</span>あなたの<br>アプリ</span></a></li>')
         return f"""<!doctype html>
     <html lang="ja">
     <head>
@@ -197,13 +199,14 @@ data:
     <header>
     {logo}
     <div>
-    <h1 id="count"><span class="p">いま <strong>{len(names)}</strong> 個のアプリが、</span><span class="p">わいわい広場の</span><span class="p">Kubernetes で動いています</span></h1>
-    <p class="lead"><span class="p">来場者が PR で載せた OSS と、</span><span class="p">AI と作った自作のアプリです。</span><br><span class="p">タイルを押すか、</span><span class="p"><b>&lt;名前&gt;.<wbr>showcase.<wbr>cloudnativedays.<wbr>jp</b> を</span><span class="p">開いてください。</span></p>
-    <a class="cta" href="{REPO}">{GITHUB_MARK}GitHub でリポジトリを開く</a>
+    <h1>OSS Showcase</h1>
+    <p class="place"><span class="p">CloudNative Days</span> <span class="p">わいわい広場の Kubernetes</span></p>
     </div>
     </header>
-    <main>{hive}</main>
-    <footer><a href="{REPO}">{QR}</a><p><span class="p">スマートフォンで読み取ると、</span><span class="p">リポジトリが開きます。</span><br><span class="p">PR を出せば、</span><span class="p">あなたのアプリも</span><span class="p">ここに並びます。</span><br><a href="{REPO}">github.com/<wbr>cloudnativedaysjp/<wbr>oss-showcase</a></p><div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div></footer>
+    <main><section class="hive" id="hive" aria-label="動いているアプリ"><ul>{"".join(tiles)}</ul></section></main>
+    <footer><a href="{REPO}">{QR}</a><p><span class="p">スマートフォンで読み取ると、</span><span class="p">リポジトリが開きます。</span><br>
+    <span class="p">PR ひとつで、</span><span class="p">ここにタイルが 1 枚増えます。</span><br>
+    <a href="{REPO}">github.com/<wbr>cloudnativedaysjp/<wbr>oss-showcase</a></p><div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div></footer>
     </div>
     <script>{SCRIPT}</script>
     </body>
