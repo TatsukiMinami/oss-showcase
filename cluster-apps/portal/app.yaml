@@ -87,17 +87,18 @@ data:
       font-family: "Public Sans", system-ui, sans-serif; line-height: 1.5;
     }
     .wrap { max-inline-size: 110rem; margin-inline: auto; padding: clamp(1.5rem, 1rem + 2vw, 3.5rem); }
-    header { display: grid; grid-template-columns: auto 1fr auto; gap: clamp(1rem, .5rem + 2vw, 2.5rem); align-items: center; }
-    @media (width < 60rem) { header { grid-template-columns: auto 1fr; } .mascots { grid-column: 1 / -1; justify-self: center; } }
+    header { display: grid; grid-template-columns: auto 1fr; gap: clamp(1rem, .5rem + 2vw, 2.5rem); align-items: center; }
     @media (width < 40rem) { header { grid-template-columns: 1fr; } }
     /* 黒猫のトゲが紺の背景に沈まないよう、2 匹の後ろにだけ光を当てる */
-    .mascots { display: flex; align-items: end; gap: clamp(.25rem, 1vw, 1rem); padding-inline: 1rem;
+    .mascots { margin-inline-start: auto; display: flex; align-items: end; gap: clamp(.25rem, 1vw, 1rem); padding-inline: 1rem;
       background: radial-gradient(ellipse 60% 55% at 50% 75%, rgb(76 192 239 / .22), transparent 70%); }
-    .mascots img { block-size: clamp(5rem, 2rem + 6vw, 10rem); inline-size: auto; }
+    .mascots img { block-size: clamp(5rem, 3rem + 5vw, 10rem); inline-size: auto; }
     .logo { inline-size: clamp(5rem, 3rem + 7vw, 11rem); block-size: auto; }
     .logo .b { fill: var(--blue); } .logo .m { fill: var(--magenta); }
     h1 { font-family: Rubik, system-ui, sans-serif; font-weight: 600; margin: 0;
-      font-size: clamp(1.75rem, 1rem + 2.6vw, 3.75rem); line-height: 1.15; text-wrap: balance; }
+      font-size: clamp(1.6rem, 1rem + 2vw, 3.25rem); line-height: 1.2; text-wrap: balance; }
+    /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
+    h1 .p { display: inline-block; }
     h1 strong { color: var(--gold); font-weight: 700; }
     .lead { margin: .5rem 0 0; color: var(--muted); font-size: clamp(1rem, .85rem + .7vw, 1.6rem); max-inline-size: 48ch; text-wrap: pretty; }
     .lead b { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
@@ -134,7 +135,7 @@ data:
       font-size: clamp(.95rem, .7rem + .8vw, 1.6rem); overflow-wrap: anywhere; }
 
     .empty { margin-block-start: 3rem; font-size: 1.5rem; color: var(--muted); }
-    footer { margin-block-start: clamp(2rem, 1rem + 3vw, 4rem); display: flex; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
+    footer { margin-block-start: clamp(2rem, 1rem + 3vw, 4rem); display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
       color: var(--muted); font-size: clamp(1rem, .8rem + .8vw, 1.75rem); }
     footer p { margin: 0; max-inline-size: 40ch; text-wrap: pretty; }
     .qr { display: block; inline-size: clamp(6rem, 4rem + 6vw, 11rem); block-size: auto; border-radius: .5rem; }
@@ -195,14 +196,13 @@ data:
     <header>
     {logo}
     <div>
-    <h1 id="count">いま <strong>{len(names)}</strong> 個のアプリが、わいわい広場の Kubernetes で動いています</h1>
+    <h1 id="count"><span class="p">いま <strong>{len(names)}</strong> 個のアプリが、</span><span class="p">わいわい広場の</span><span class="p">Kubernetes で動いています</span></h1>
     <p class="lead">来場者が PR で載せた OSS と、AI と作った自作のアプリです。タイルを押すか、<b>&lt;名前&gt;.showcase.cloudnativedays.jp</b> を開いてください。</p>
     <a class="cta" href="{REPO}">{GITHUB_MARK}GitHub でリポジトリを開く</a>
     </div>
-    <div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div>
     </header>
     <main>{hive}</main>
-    <footer><a href="{REPO}">{QR}</a><p>スマートフォンで読み取ると、リポジトリが開きます。<a href="{REPO}">github.com/cloudnativedaysjp/oss-showcase</a> に PR を出せば、あなたのアプリもここに並びます。</p></footer>
+    <footer><a href="{REPO}">{QR}</a><p>スマートフォンで読み取ると、リポジトリが開きます。<a href="{REPO}">github.com/cloudnativedaysjp/oss-showcase</a> に PR を出せば、あなたのアプリもここに並びます。</p><div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div></footer>
     </div>
     <script>{SCRIPT}</script>
     </body>
