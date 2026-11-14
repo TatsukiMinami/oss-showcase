@@ -1,6 +1,6 @@
 # OSS Showcase
 
-CloudNative Days のわいわい広場で動いている Kubernetes に、あなたのアプリをデプロイしてみませんか。
+CloudNative Days のWAIWAI広場で動いている Kubernetes に、あなたのアプリをデプロイしてみませんか。
 
 推しの OSS でも、AI と一緒に作った自作のアプリでも構いません。
 認証なしで pull できるコンテナイメージがあれば載せられます。
@@ -14,7 +14,7 @@ flowchart LR
   ci["CI<br>check.py"] -. "ルールを確かめる" .-> repo
   staff["スタッフ"] -- "レビューしてマージ" --> repo
   repo -- "main を同期" --> argo["Argo CD"]
-  subgraph cluster["わいわい広場の Kubernetes"]
+  subgraph cluster["WAIWAI広場の Kubernetes"]
     argo --> ns["app-あなたのアプリ"]
     gw["Gateway"] --> ns
   end

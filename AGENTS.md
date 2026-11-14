@@ -1,6 +1,6 @@
 # AGENTS.md
 
-CloudNative Days のわいわい広場で、来場者が推しの OSS や AI で作った自作のアプリを Kubernetes にデプロイする展示のリポジトリ。
+CloudNative Days のWAIWAI広場で、来場者が推しの OSS や AI で作った自作のアプリを Kubernetes にデプロイする展示のリポジトリ。
 main にマージされた YAML を Argo CD が同期する。
 
 ## 来場者のアプリを足すとき
