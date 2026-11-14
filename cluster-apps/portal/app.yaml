@@ -98,9 +98,10 @@ data:
     h1 { font-family: Rubik, system-ui, sans-serif; font-weight: 600; margin: 0;
       font-size: clamp(1.6rem, 1rem + 2vw, 3.25rem); line-height: 1.2; text-wrap: balance; }
     /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
-    h1 .p { display: inline-block; }
+    .p { display: inline-block; max-inline-size: 100%; }
+    h1, .lead, footer p { word-break: auto-phrase; }
     h1 strong { color: var(--gold); font-weight: 700; }
-    .lead { margin: .5rem 0 0; color: var(--muted); font-size: clamp(1rem, .85rem + .7vw, 1.6rem); max-inline-size: 48ch; text-wrap: pretty; }
+    .lead { margin: .5rem 0 0; color: var(--muted); font-size: clamp(1rem, .85rem + .7vw, 1.6rem); max-inline-size: 48ch; }
     .lead b { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
     footer a { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
     footer a:has(.qr) { flex: none; display: block; border-radius: .5rem; }
@@ -137,7 +138,7 @@ data:
     .empty { margin-block-start: 3rem; font-size: 1.5rem; color: var(--muted); }
     footer { margin-block-start: clamp(2rem, 1rem + 3vw, 4rem); display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
       color: var(--muted); font-size: clamp(1rem, .8rem + .8vw, 1.75rem); }
-    footer p { margin: 0; max-inline-size: 40ch; text-wrap: pretty; }
+    footer p { margin: 0; }
     .qr { display: block; inline-size: clamp(6rem, 4rem + 6vw, 11rem); block-size: auto; border-radius: .5rem; }
 
     /* ページを開いたときに 1 回だけ、ロゴとタイルが組み上がる */
@@ -197,12 +198,12 @@ data:
     {logo}
     <div>
     <h1 id="count"><span class="p">いま <strong>{len(names)}</strong> 個のアプリが、</span><span class="p">わいわい広場の</span><span class="p">Kubernetes で動いています</span></h1>
-    <p class="lead">来場者が PR で載せた OSS と、AI と作った自作のアプリです。タイルを押すか、<b>&lt;名前&gt;.showcase.cloudnativedays.jp</b> を開いてください。</p>
+    <p class="lead"><span class="p">来場者が PR で載せた OSS と、</span><span class="p">AI と作った自作のアプリです。</span><br><span class="p">タイルを押すか、</span><span class="p"><b>&lt;名前&gt;.<wbr>showcase.<wbr>cloudnativedays.<wbr>jp</b> を</span><span class="p">開いてください。</span></p>
     <a class="cta" href="{REPO}">{GITHUB_MARK}GitHub でリポジトリを開く</a>
     </div>
     </header>
     <main>{hive}</main>
-    <footer><a href="{REPO}">{QR}</a><p>スマートフォンで読み取ると、リポジトリが開きます。<a href="{REPO}">github.com/cloudnativedaysjp/oss-showcase</a> に PR を出せば、あなたのアプリもここに並びます。</p><div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div></footer>
+    <footer><a href="{REPO}">{QR}</a><p><span class="p">スマートフォンで読み取ると、</span><span class="p">リポジトリが開きます。</span><br><span class="p">PR を出せば、</span><span class="p">あなたのアプリも</span><span class="p">ここに並びます。</span><br><a href="{REPO}">github.com/<wbr>cloudnativedaysjp/<wbr>oss-showcase</a></p><div class="mascots"><img src="{MASCOTS}/suu-2.png" alt="" width="2586" height="1716"><img src="{MASCOTS}/toge-2.png" alt="" width="2587" height="1716"></div></footer>
     </div>
     <script>{SCRIPT}</script>
     </body>
