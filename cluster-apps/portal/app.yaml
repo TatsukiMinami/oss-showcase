@@ -195,7 +195,7 @@ data:
     <div class="wrap">
     <header>
     <h1>OSS Showcase</h1>
-    <p class="place"><span class="p">{LOGO}CloudNative Days</span> <span class="p">わいわい広場の Kubernetes</span></p>
+    <p class="place"><span class="p">{LOGO}CloudNative Days</span> <span class="p">WAIWAI広場の Kubernetes</span></p>
     </header>
     <main><section class="hive" id="hive" aria-label="動いているアプリ"><ul>{"".join(tiles)}</ul></section></main>
     <footer><a href="{REPO}">{QR}</a><p><span class="p">スマートフォンで読み取ると、</span><span class="p">リポジトリが開きます。</span><br>
