@@ -80,14 +80,16 @@ data:
 
     CSS = """
     :root {
-      --navy: #0b2238; --blue: #216a9c; --magenta: #be4493; --gold: #deb010;
-      --paper: #eef4f9; --muted: #9db4c8;
+      --bg: #f3f7fb; --ink: #1e2d3d; --muted: #566577; --blue: #216a9c; --magenta: #be4493;
+      --orange: #ef9214; --orange-ink: #9a5a04;
       --s: clamp(7.5rem, 5rem + 6vw, 12rem); --m: .3rem;
-      color-scheme: dark;
+      color-scheme: light;
     }
     body {
-      margin: 0; min-block-size: 100dvh; background: var(--navy); color: var(--paper);
-      font-family: "Public Sans", system-ui, sans-serif; line-height: 1.5; overflow-x: clip;
+      margin: 0; min-block-size: 100dvh; color: var(--ink); overflow-x: clip; line-height: 1.6;
+      font-family: "Gill Sans Nova", "Gill Sans", "Gill Sans MT", "Zen Kaku Gothic New", sans-serif;
+      /* 今の CND のサイトの紙吹雪にならい、ロゴの 3 色の小さな四角を、右上にだけ散らす */
+      background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='320'><g opacity='.55'><rect x='291' y='48' width='10' height='5' rx='1' fill='%23216a9c' transform='rotate(-60 296 51)'/><rect x='482' y='117' width='10' height='5' rx='1' fill='%23be4493' transform='rotate(57 487 120)'/><rect x='193' y='28' width='16' height='5' rx='1' fill='%23ef9214' transform='rotate(-60 201 30)'/><rect x='82' y='136' width='10' height='5' rx='1' fill='%23216a9c' transform='rotate(63 87 138)'/><rect x='568' y='187' width='10' height='5' rx='1' fill='%23be4493' transform='rotate(11 573 189)'/><rect x='357' y='312' width='10' height='5' rx='1' fill='%23ef9214' transform='rotate(8 362 315)'/><rect x='120' y='134' width='10' height='5' rx='1' fill='%23216a9c' transform='rotate(10 125 137)'/><rect x='504' y='218' width='10' height='5' rx='1' fill='%23be4493' transform='rotate(11 509 221)'/><rect x='575' y='119' width='10' height='5' rx='1' fill='%23ef9214' transform='rotate(9 580 122)'/><rect x='557' y='159' width='16' height='5' rx='1' fill='%23216a9c' transform='rotate(39 565 161)'/><rect x='419' y='296' width='14' height='5' rx='1' fill='%23be4493' transform='rotate(-28 426 298)'/><rect x='715' y='224' width='12' height='5' rx='1' fill='%23ef9214' transform='rotate(-59 721 226)'/><rect x='270' y='158' width='14' height='5' rx='1' fill='%23216a9c' transform='rotate(32 277 161)'/><rect x='259' y='314' width='10' height='5' rx='1' fill='%23be4493' transform='rotate(2 264 316)'/><rect x='148' y='109' width='16' height='5' rx='1' fill='%23ef9214' transform='rotate(-11 156 112)'/><rect x='866' y='25' width='14' height='5' rx='1' fill='%23216a9c' transform='rotate(-22 873 27)'/><rect x='315' y='159' width='16' height='5' rx='1' fill='%23be4493' transform='rotate(-60 323 161)'/><rect x='84' y='86' width='10' height='5' rx='1' fill='%23ef9214' transform='rotate(-62 89 89)'/><rect x='631' y='207' width='16' height='5' rx='1' fill='%23216a9c' transform='rotate(-30 639 210)'/><rect x='347' y='214' width='10' height='5' rx='1' fill='%23be4493' transform='rotate(62 352 216)'/><rect x='320' y='195' width='16' height='5' rx='1' fill='%23ef9214' transform='rotate(-62 328 198)'/><rect x='691' y='41' width='12' height='5' rx='1' fill='%23216a9c' transform='rotate(-14 697 44)'/></g></svg>") right top / min(900px, 60vw) auto no-repeat, var(--bg);
     }
     .wrap { max-inline-size: 110rem; margin-inline: auto; padding: clamp(1.5rem, 1rem + 2vw, 3.5rem); }
     /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
@@ -96,9 +98,9 @@ data:
     /* CND のロゴは、場所の名前の頭に文字と同じ高さで置く */
     .logo { inline-size: auto; block-size: 1.15em; vertical-align: -.2em; margin-inline-end: .4em; }
     .logo .b { fill: var(--blue); } .logo .m { fill: var(--magenta); }
-    h1 { margin: 0; font-family: Rubik, system-ui, sans-serif; font-weight: 700; letter-spacing: -.01em;
-      font-size: clamp(2rem, 1.2rem + 3vw, 4.5rem); line-height: 1; }
-    .place { margin: .5rem 0 0; color: var(--muted); font-size: clamp(.95rem, .8rem + .6vw, 1.5rem); word-break: auto-phrase; }
+    h1 { margin: 0; color: var(--blue); font-weight: 700; letter-spacing: .01em;
+      font-size: clamp(2.2rem, 1.3rem + 3.2vw, 4.75rem); line-height: 1; }
+    .place { margin: .6rem 0 0; color: var(--muted); font-weight: 500; font-size: clamp(.95rem, .8rem + .6vw, 1.5rem); word-break: auto-phrase; }
 
     /* ハニカム。左に置いた浮動要素の shape-outside で、行ごとに半分ずらす。浮動要素の高さを % で決めるため、親を flex にする */
     /* 最後の段が ul の高さに数えられず、1 段分はみ出す（Chrome で測った）。その分を下に足す */
@@ -110,46 +112,43 @@ data:
     .hive li { display: inline-block; vertical-align: top; inline-size: var(--s); block-size: calc(var(--s) * 1.1547);
       margin: var(--m); margin-block-end: calc(var(--m) - var(--s) * .2885); font-size: 1rem; }
     .hex { position: relative; isolation: isolate; display: grid; place-content: center; text-align: center;
-      inline-size: 100%; block-size: 100%; padding: 0 12%; box-sizing: border-box; color: white; text-decoration: none; }
+      inline-size: 100%; block-size: 100%; padding: 0 7%; box-sizing: border-box; color: white; text-decoration: none; }
     .hex::before, .hex::after { content: ""; position: absolute; inset: 0; z-index: -1;
       clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); }
     .hex::before { background: var(--tile); transition: background-color .2s; }
     .blue { --tile: var(--blue); } .magenta { --tile: var(--magenta); }
-    a.hex:hover::before { background: color-mix(in oklab, var(--tile), white 18%); }
+    a.hex:hover::before { background: color-mix(in oklab, var(--tile), black 14%); }
     /* clip-path は自分のフォーカスの枠も切るので、ひと回り大きい六角形を後ろに描く */
     a.hex:focus-visible { outline: none; }
-    a.hex:focus-visible::after { inset: -.35rem; z-index: -2; background: var(--sky, #4cc0ef); }
-    .name { font-family: Rubik, system-ui, sans-serif; font-weight: 600; line-height: 1.15;
-      font-size: clamp(.95rem, .7rem + .8vw, 1.6rem); overflow-wrap: anywhere; }
+    a.hex:focus-visible::after { inset: -.35rem; z-index: -2; background: var(--ink); }
+    /* 名前はなるべく 1 語のまま入れる。入りきらないときだけ折り返す */
+    .name { font-weight: 700; line-height: 1.15; font-size: clamp(.9rem, .65rem + .7vw, 1.45rem); overflow-wrap: break-word; }
 
     /* 動いているアプリの数。蜂の巣の最初の 1 枚にする */
-    .count { --tile: var(--gold); color: var(--navy); }
-    .count b { display: block; font-family: Rubik, system-ui, sans-serif; font-weight: 700; line-height: 1;
-      font-size: clamp(2.6rem, 1.6rem + 3vw, 5rem); }
-    .count span { font-weight: 600; font-size: clamp(.75rem, .6rem + .4vw, 1.05rem); line-height: 1.3; }
+    .count { --tile: var(--orange); color: var(--ink); }
+    .count b { display: block; font-weight: 700; line-height: 1; font-size: clamp(2.8rem, 1.7rem + 3.2vw, 5.4rem); }
+    .count span { font-weight: 700; font-size: clamp(.75rem, .6rem + .4vw, 1.05rem); line-height: 1.35; }
     /* 蜂の巣の空いているマス。押すとリポジトリが開く */
-    .invite { --tile: var(--gold); color: var(--gold); }
-    .invite::after { inset: .3rem; background: var(--navy); }
-    a.invite:hover::after { background: color-mix(in oklab, var(--navy), var(--gold) 12%); }
+    .invite { --tile: var(--orange); color: var(--orange-ink); }
+    .invite::after { inset: .3rem; background: var(--bg); }
+    a.invite:hover::after { background: color-mix(in oklab, var(--bg), var(--orange) 15%); }
     .invite .name { font-size: clamp(.85rem, .65rem + .6vw, 1.3rem); }
-    .invite .plus { display: block; font-family: Rubik, system-ui, sans-serif; font-weight: 600; line-height: 1;
-      font-size: clamp(1.8rem, 1.2rem + 2vw, 3.2rem); }
+    .invite .plus { display: block; font-weight: 700; line-height: 1; font-size: clamp(1.8rem, 1.2rem + 2vw, 3.2rem); }
 
-    footer { display: flex; flex-wrap: wrap; align-items: center; gap: clamp(1rem, .5rem + 2vw, 2rem);
+    footer { display: flex; flex-wrap: wrap; align-items: end; gap: clamp(1rem, .5rem + 2vw, 2rem);
       color: var(--muted); font-size: clamp(1rem, .85rem + .6vw, 1.5rem); }
     footer p { margin: 0; word-break: auto-phrase; }
-    footer a { color: var(--paper); font-weight: 600; overflow-wrap: anywhere; }
+    footer a { color: var(--blue); font-weight: 700; overflow-wrap: anywhere; }
     footer a:has(.qr) { flex: none; display: block; border-radius: .5rem; }
-    footer a:focus-visible { outline: 3px solid #4cc0ef; outline-offset: 3px; }
-    .qr { display: block; inline-size: clamp(6rem, 4rem + 5vw, 10rem); block-size: auto; border-radius: .5rem; }
-    /* 黒猫のトゲが紺の背景に沈まないよう、2 匹の後ろにだけ光を当てる */
-    .mascots { margin-inline-start: auto; display: flex; align-items: end; gap: clamp(.25rem, 1vw, 1rem); padding-inline: 1rem;
-      background: radial-gradient(ellipse 60% 55% at 50% 75%, rgb(76 192 239 / .22), transparent 70%); }
+    footer a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+    .qr { display: block; inline-size: clamp(6rem, 4rem + 5vw, 10rem); block-size: auto; border-radius: .5rem;
+      box-shadow: 0 0 0 1px rgb(30 45 61 / .12); }
+    .mascots { margin-inline-start: auto; display: flex; align-items: end; gap: clamp(.25rem, 1vw, 1rem); }
     .mascots img { block-size: clamp(5rem, 3rem + 5vw, 10rem); inline-size: auto; }
 
-    /* ページを開いたときに 1 回だけ、ロゴとタイルが組み上がる */
+    /* ページを開いたときに 1 回だけ、タイルが順に現れる */
     @media (prefers-reduced-motion: no-preference) {
-      .hive li { animation: rise .6s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(400ms + var(--i) * 60ms); }
+      .hive li { animation: rise .6s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 60ms); }
     }
     @keyframes rise { from { opacity: 0; scale: .6; } }
     """
@@ -184,12 +183,12 @@ data:
     <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="light">
     <title>OSS Showcase | CloudNative Days</title>
     <link rel="icon" href="data:image/svg+xml,{FAVICON}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&family=Rubik:wght@600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700&display=swap">
     <style>{CSS}</style>
     </head>
     <body>
