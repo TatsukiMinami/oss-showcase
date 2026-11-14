@@ -26,6 +26,9 @@ jobs:
       # charts/ のチャートを描画し、中身も check.py と kubeconform にかける
       - run: python scripts/render_charts.py
       - run: python scripts/test_check.py
+      # ポータルの ConfigMap が server.py と揃っているか
+      - run: python scripts/render_portal.py --check
+      - run: python scripts/test_portal.py
       - run: python scripts/check.py
       - name: kubeconform
         run: |
