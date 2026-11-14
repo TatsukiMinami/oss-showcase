@@ -75,6 +75,9 @@ data:
     <g class="b"><polygon points="66.77 15.24 57.97 0 39.25 0 30.44 15.24"/><polygon points="97.27 33.65 87.9 17.43 70.59 17.43 88.6 48.64"/><polygon points="59.82 33.65 69.19 49.86 86.71 49.86 68.59 18.47"/><polygon points="68.86 83.71 87.05 52.19 69.38 52.19 60.02 68.4"/><polygon points="88.87 53.53 70.93 84.62 88.1 84.62 97.46 68.4"/><polygon points="30.84 87.09 39.48 102.05 58.2 102.05 66.84 87.09"/><polygon points=".18 68.4 9.54 84.62 26.7 84.62 8.76 53.55"/><polygon points="8.66 48.64 26.68 17.43 9.36 17.43 0 33.65"/></g>
     </svg>"""
 
+    # タブのアイコン。CND のロゴをそのまま使う
+    FAVICON = __import__("urllib.parse").parse.quote(LOGO.replace('class="logo" ', '').replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" ').replace('class="m"', 'fill="#be4493"').replace('class="b"', 'fill="#216a9c"'))
+
     CSS = """
     :root {
       --navy: #0b2238; --blue: #216a9c; --magenta: #be4493; --gold: #deb010;
@@ -90,12 +93,12 @@ data:
     /* 日本語が単語の途中で折り返さないよう、文節ごとのかたまりの中では折り返さない */
     .p { display: inline-block; max-inline-size: 100%; }
 
-    header { display: flex; align-items: center; gap: clamp(.75rem, .5rem + 1.2vw, 1.5rem); }
-    .logo { inline-size: clamp(3.5rem, 2.5rem + 3vw, 6rem); block-size: auto; flex: none; }
+    /* CND のロゴは、場所の名前の頭に文字と同じ高さで置く */
+    .logo { inline-size: auto; block-size: 1.15em; vertical-align: -.2em; margin-inline-end: .4em; }
     .logo .b { fill: var(--blue); } .logo .m { fill: var(--magenta); }
     h1 { margin: 0; font-family: Rubik, system-ui, sans-serif; font-weight: 700; letter-spacing: -.01em;
       font-size: clamp(2rem, 1.2rem + 3vw, 4.5rem); line-height: 1; }
-    .place { margin: .35rem 0 0; color: var(--muted); font-size: clamp(.95rem, .8rem + .6vw, 1.5rem); word-break: auto-phrase; }
+    .place { margin: .5rem 0 0; color: var(--muted); font-size: clamp(.95rem, .8rem + .6vw, 1.5rem); word-break: auto-phrase; }
 
     /* ハニカム。左に置いた浮動要素の shape-outside で、行ごとに半分ずらす。浮動要素の高さを % で決めるため、親を flex にする */
     /* 最後の段が ul の高さに数えられず、1 段分はみ出す（Chrome で測った）。その分を下に足す */
@@ -146,10 +149,8 @@ data:
 
     /* ページを開いたときに 1 回だけ、ロゴとタイルが組み上がる */
     @media (prefers-reduced-motion: no-preference) {
-      .logo polygon { animation: drop .7s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i) * 45ms); }
       .hive li { animation: rise .6s cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(400ms + var(--i) * 60ms); }
     }
-    @keyframes drop { from { opacity: 0; translate: 0 -30%; } }
     @keyframes rise { from { opacity: 0; scale: .6; } }
     """
 
@@ -171,10 +172,6 @@ data:
 
 
     def page(names: list[str]) -> str:
-        logo = LOGO
-        for i in range(12):
-            logo = logo.replace("<polygon ", f'<polygon style="--i:{i}" data-x ', 1)
-        logo = logo.replace(" data-x ", " ")
         tiles = [f'<li style="--i:0"><div class="hex count"><b>{len(names)}</b><span>動いている<br>アプリ</span></div></li>']
         tiles += [
             f'<li style="--i:{i}"><a class="hex {TILE_COLORS[zlib.crc32(h.encode()) % 2]}" href="https://{html.escape(h)}/">'
@@ -189,6 +186,7 @@ data:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
     <title>OSS Showcase | CloudNative Days</title>
+    <link rel="icon" href="data:image/svg+xml,{FAVICON}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600&family=Rubik:wght@600;700&display=swap">
@@ -197,11 +195,8 @@ data:
     <body>
     <div class="wrap">
     <header>
-    {logo}
-    <div>
     <h1>OSS Showcase</h1>
-    <p class="place"><span class="p">CloudNative Days</span> <span class="p">わいわい広場の Kubernetes</span></p>
-    </div>
+    <p class="place"><span class="p">{LOGO}CloudNative Days</span> <span class="p">わいわい広場の Kubernetes</span></p>
     </header>
     <main><section class="hive" id="hive" aria-label="動いているアプリ"><ul>{"".join(tiles)}</ul></section></main>
     <footer><a href="{REPO}">{QR}</a><p><span class="p">スマートフォンで読み取ると、</span><span class="p">リポジトリが開きます。</span><br>
