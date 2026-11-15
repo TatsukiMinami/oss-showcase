@@ -1,0 +1,109 @@
+# デプロイされているアプリの一覧を出す入口のページ。コードは server.py、ConfigMap は scripts/render_portal.py が作る
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: portal
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: showcase-portal
+rules:
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - httproutes
+  verbs:
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: showcase-portal
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: showcase-portal
+subjects:
+- kind: ServiceAccount
+  name: portal
+  namespace: app-portal
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portal
+  template:
+    metadata:
+      labels:
+        app: portal
+      annotations:
+        showcase.cloudnativedays.jp/server-sha256: 6b18a85d239bfa843bd37c68e46c92ea9503abdf0fc7c693aee4d711048f6809
+    spec:
+      serviceAccountName: portal
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      containers:
+      - name: portal
+        image: python:3.13-alpine@sha256:9ef1a599f863231c3d91e941389bfdc4a2d6070557243d54df1a4e57015b960e
+        command:
+        - python3
+        - /app/server.py
+        ports:
+        - containerPort: 8080
+        securityContext:
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      volumes:
+      - name: app
+        configMap:
+          name: portal
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portal
+spec:
+  selector:
+    app: portal
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: portal
+spec:
+  parentRefs:
+  - name: showcase
+    namespace: gateway
+  hostnames:
+  - portal.showcase.cloudnativedays.jp
+  rules:
+  - backendRefs:
+    - name: portal
+      port: 80

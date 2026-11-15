@@ -1,36 +1,29 @@
 # AGENTS.md
 
-CloudNative Days のブースで、来場者が推しの OSS を Kubernetes にデプロイする展示のリポジトリ。
+CloudNative Days のWAIWAI広場で、来場者が推しの OSS や AI で作った自作のアプリを Kubernetes にデプロイする展示のリポジトリ。
 main にマージされた YAML を Argo CD が同期する。
 
-## 来場者の OSS を足すとき
+## 来場者のアプリを足すとき
 
-1. `apps/example/` をコピーして `apps/<名前>/` を作る。`<名前>` は英小文字、数字、ハイフンにする
-2. `image` と `containerPort`、Service の `targetPort` をその OSS に合わせる
-3. HTTPRoute の `hostnames` を `<名前>.showcase.cloudnativedays.jp` だけにする
-4. 「確かめる」のコマンドがすべて通ったら完了
+README.md の「やってみる」の手順に従う。
+docs/rules.md に書かれたことは、すべて守る。
+アプリを選ぶときも、docs/rules.md の制限で動くかを確かめる。例えば、外への通信は DNS、80 番、443 番だけ。
 
-PR が変えるのは `apps/<名前>/` の中だけにする。
-Helm チャートや Kustomize は Argo CD に描画させない。`helm template` や `kustomize build` の結果を YAML でコミットする。
-`helm template` には `--namespace app-<名前> --skip-tests` を付ける。使えない種類のリソースは、チャートの values で止める。
-CRD や ClusterRole が要る OSS は、`apps/` の代わりに `cluster-apps/<名前>/` に置く。
-
-作れるリソースの種類は README.md の「使えるリソース」にある。
-Namespace、ResourceQuota、LimitRange は運営が入れるので、来場者の YAML には書かない。
-公開には HTTPRoute を使う。Ingress、LoadBalancer、NodePort は使えない。
-
-### リソースと権限の上限
-
-- 1 アプリの合計で、CPU 4 コア、メモリ 4Gi、Pod 10 個、PVC 2 個、emptyDir とログ 5Gi まで
-- コンテナは root で動いてよいが、特権コンテナと hostPath は使わない
-- イメージは認証なしで pull できるものにする
-- Secret もリポジトリで公開される。本物の認証情報やトークンは書かず、ダミーの値にする
+- fork したリポジトリで作業し、元のリポジトリに PR を出す
+- PR が変えるのは、`apps/<名前>/`、`cluster-apps/<名前>/`、`charts/<名前>/` のどれか 1 つの中だけにする
+- YAML はそのディレクトリの直下に置く。Argo CD はサブディレクトリを読まない
+- Helm チャートは `charts/<名前>/helm.yaml` に書く。docs/rules.md の「Helm チャートを使うとき」に従う。`version` は固定する
+- Helm のときも、HTTPRoute は `helm.yaml` の隣に YAML で置く。`backendRefs` はチャートが作る Service を指す。描画した結果は `python3 scripts/render_charts.py` で確かめられる
+- Kustomize は Argo CD に描画させない。`kustomize build` の結果を `apps/<名前>/` にコミットする
+- Secret は使ってよいが、リポジトリごと公開されて誰でも読める。テスト用の値など、見られても困らない値だけを書く
+- クラスタはイベントの後に消え、会期中も作り直すことがある。データが残る前提の構成にしない
+- 管理者のパスワードも読めるので、そのままでは誰でもログインできる。ログインを止めるか、閲覧だけにする
 
 ## 確かめる
 
 ```bash
-pip install pyyaml
-python scripts/check.py        # 展示のルール。CI と同じ
+python3 -m pip install pyyaml   # 入っていなければ
+python3 scripts/check.py        # 展示のルール。CI と同じ。通ると ok と出る
 ```
 
 CI では kubeconform も走る。手元にあれば `kubeconform -summary -ignore-missing-schemas apps cluster-apps` で同じものを確かめられる。

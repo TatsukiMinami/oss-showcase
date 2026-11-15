@@ -1,78 +1,58 @@
 # OSS Showcase
 
-あなたが作った OSS や推しの OSS を、ブースの Kubernetes にデプロイしてみませんか。
+CloudNative Days のWAIWAI広場で動いている Kubernetes に、あなたのアプリをデプロイしてみませんか。
 
-## デプロイのしかた
+推しの OSS でも、AI と一緒に作った自作のアプリでも構いません。
+認証なしで pull できるコンテナイメージがあれば載せられます。
+このリポジトリに Pull Request を出してマージされると、1 分ほどで `http://<アプリの名前>.showcase.cloudnativedays.jp` に公開されます。
+
+## しくみ
+
+```mermaid
+flowchart LR
+  you["あなた"] -- "Pull Request" --> repo["oss-showcase"]
+  ci["CI<br>check.py"] -. "ルールを確かめる" .-> repo
+  staff["スタッフ"] -- "レビューしてマージ" --> repo
+  repo -- "main を同期" --> argo["Argo CD"]
+  subgraph cluster["WAIWAI広場の Kubernetes"]
+    argo --> ns["app-あなたのアプリ"]
+    gw["Gateway"] --> ns
+  end
+  browser["ブラウザ"] -- "http://あなたのアプリ.showcase.cloudnativedays.jp" --> gw
+```
+
+main にマージされた YAML を、Argo CD がクラスタに同期します。
+アプリごとに専用の namespace が用意され、ほかの人のアプリとは通信も資源も分かれています。
+
+## やってみる
 
 1. このリポジトリを fork する
-2. `apps/example/` をコピーして `apps/<OSS の名前>/` を作る
-3. `image` をその OSS のコンテナイメージに書き換える
-4. HTTPRoute の `hostnames` を `<OSS の名前>.showcase.cloudnativedays.jp` にする
-5. Pull Request を出す。スタッフがマージすると、1 分ほどでデプロイされる
+2. `apps/example/` をコピーして、`apps/<アプリの名前>/` を作る
+3. `app.yaml` の 3 か所を書き換える
+   - `image`：そのアプリのコンテナイメージ
+   - `containerPort` と Service の `targetPort`：そのアプリが待ち受けるポート
+   - HTTPRoute の `hostnames`：`<アプリの名前>.showcase.cloudnativedays.jp`
+4. `python3 scripts/check.py` を実行して、`ok` と出ることを確かめる
+5. Pull Request を出す。スタッフがレビューしてマージします
 
-`http://<OSS の名前>.showcase.cloudnativedays.jp` を開くと表示されます。
+## こんなときは
 
-Claude Code などのエージェントに任せるときは、`AGENTS.md` を読ませてください。
+- **Helm チャートを使いたい**：`charts/<アプリの名前>/helm.yaml` にチャートを書けば、そのまま使えます。手順は [ルール](docs/rules.md#helm-チャートを使うとき) にあります
+- **データベースを使いたい**：CloudNativePG で PostgreSQL を作れます。[ルール](docs/rules.md#postgresql-が要るとき) に例があります
+- **Operator のように CRD が要る**：`cluster-apps/` に置きます。スタッフが中身を確認してからマージします
+- **Claude Code などのエージェントに任せたい**：[AGENTS.md](AGENTS.md) を読ませてください
 
-このリポジトリは公開されています。Secret に本物のパスワードやトークンを書かないでください。
+## 気をつけてほしいこと
 
-## 使えるリソース
+- Secret も使えます。ただし、このリポジトリは公開されていて、書いた値は誰でも読めます。テスト用の値のように、見られても困らないものだけを書いてください
+- 管理者のパスワードも誰でも読めるので、誰でもログインできてしまいます。ログインを止めるか、閲覧だけにしてください
+- クラスタはイベントが終わったら消します。PVC やデータベースのデータも残りません
+- 会期中も、運営がクラスタを再起動したり作り直したりすることがあります。残しておきたいデータは置かないでください
+- 外への通信は、DNS と HTTP、HTTPS だけが通ります
+- 特権コンテナは使えません
 
-- Deployment、StatefulSet、Job、CronJob
-- HorizontalPodAutoscaler、PodDisruptionBudget
-- Service、HTTPRoute
-- ConfigMap、Secret、PersistentVolumeClaim
-- ServiceAccount、Role、RoleBinding
-- CloudNativePG の Cluster
-
-外部への公開には HTTPRoute を使ってください。Ingress は使えません。
-別のアプリの namespace からの通信は届きません。
-外への通信は、DNS と 80 番、443 番だけが通ります。
-Pod には、書かれていなければ `seccompProfile: RuntimeDefault` と `allowPrivilegeEscalation: false` が付きます。sudo のように実行中に権限を上げる処理は動きません。
-user namespace を作ろうとしたプロセスは止められます。Chromium のサンドボックスのように user namespace を使う OSS は動きません。
-
-### Helm チャートしかないとき
-
-Helm チャートや Kustomize はそのままでは使えません。`.yaml` と `.yml` だけを読みます。
-手元で YAML に展開して、その結果をコミットしてください。
-
-```sh
-helm template <OSS の名前> <チャート> --namespace app-<OSS の名前> --skip-tests > apps/<OSS の名前>/app.yaml
-```
-
-`apps/` で使えるのは、上の「使えるリソース」に並んだ種類だけです。
-ほかの種類が出てきたら、チャートの values で止めてください。よく出てくるものは次のとおりです。
-
-- Ingress は使えません。代わりに HTTPRoute を書いてください
-- NetworkPolicy と ServiceMonitor は使えません
-- ClusterRole が出てきたら、namespace に閉じた Role にする values を探してください。Grafana なら `rbac.namespaced=true` です
-
-### PostgreSQL が要るとき
-
-[CloudNativePG](https://cloudnative-pg.io/) の `Cluster` を書くと、自分の namespace に PostgreSQL ができます。
-`<Cluster の名前>-app` という Secret に、接続先とパスワードが入ります。
-
-```yaml
-apiVersion: postgresql.cnpg.io/v1
-kind: Cluster
-metadata:
-  name: db
-spec:
-  instances: 1
-  storage:
-    size: 1Gi
-```
-
-### CRD やクラスタの権限が要るとき
-
-Operator のように、CRD や ClusterRole が要る OSS は `cluster-apps/<名前>/` に置いてください。
-`apps/` の代わりに置くもので、両方には置けません。
-実行委員が中身を確認してからマージします。
-
-どちらに置いても、特権コンテナは使えません。必要なときは実行委員に相談してください。
-
-`resources` を書かなければ、コンテナごとに CPU 0.5 コアとメモリ 256Mi が上限になります。
-足りなければ `resources.limits` を書いてください。1 アプリの合計で、CPU 4 コアとメモリ 4Gi まで使えます。emptyDir とログは合わせて 5Gi までです。
+CPU やメモリの上限、使えるリソースの種類などの細かいルールは [docs/rules.md](docs/rules.md) にまとめています。
+CI で引っかかったときも、ここを見てください。
 
 ## ライセンス
 
